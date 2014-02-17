@@ -49,12 +49,24 @@ public interface CacheServiceFactory {
                 return fact.get();
             }
         },
+        Memcached() {
+            @Override
+            public CacheService get() {
+                CacheServiceFactory fact = _.newInstance("org.osgl.cache.impl.MemcachedServiceFactory");
+                return fact.get();
+            }
+        },
         Auto() {
             @Override
             public CacheService get() {
                 try {
-                    return EhCache.get();
+                    return Memcached.get();
                 } catch (Throwable e) {
+                    // ignore
+                }
+                try {
+                    return EhCache.get();
+                } catch (Throwable throwable) {
                     // ignore
                 }
                 return Simple.get();

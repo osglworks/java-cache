@@ -123,6 +123,7 @@ public class MemcachedService implements CacheService {
                                         .setProtocol(ConnectionFactoryBuilder.Protocol.BINARY)
                                         .setAuthDescriptor(ad)
                                         .build();
+            client = new MemcachedClient(cf, addrs);
         } else {
             client = new MemcachedClient(addrs);
         }

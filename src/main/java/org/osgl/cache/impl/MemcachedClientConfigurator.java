@@ -90,4 +90,8 @@ public class MemcachedClientConfigurator {
     public static String getPassword() {
         return conf().password;
     }
+
+    public static void applyConfig() throws IOException {
+        MemcachedService.getInstance(true);
+    }
 }
