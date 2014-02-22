@@ -1,10 +1,13 @@
 package org.osgl.cache.impl;
 
 import net.spy.memcached.AddrUtil;
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.osgl.util.S;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -13,6 +16,8 @@ import java.util.Properties;
  * Created by luog on 17/02/14.
  */
 public class MemcachedClientConfigurator {
+
+    protected static final Logger logger = L.get(MemcachedClientConfigurator.class);
 
     public static final String CONF_FILE = "memcached.properties";
 
@@ -28,22 +33,39 @@ public class MemcachedClientConfigurator {
         // try load properties
         Properties prop = new Properties();
         try {
-            prop.load(MemcachedClientConfigurator.class.getResourceAsStream(CONF_FILE));
+            URL url = null;
+            url = Thread.currentThread().getContextClassLoader().getResource(CONF_FILE);
+            if (null == url) {
+                url = MemcachedClientConfigurator.class.getResource(CONF_FILE);
+            }
+            if (null == url) {
+                logger.warn("Cannot find " + CONF_FILE + " in class path");
+            } else {
+                prop.load(url.openStream());
+            }
         } catch (IOException e) {
-            // ignore
+            logger.error(e, "error loading memcached client configuration file: " + CONF_FILE);
         }
 
         // try load System properties
         prop.putAll(System.getProperties());
 
         Config conf = new Config();
-        if (prop.contains("memcached.host")) {
-            conf.hosts = AddrUtil.getAddresses(prop.getProperty("memcached.host"));
+        if (prop.containsKey("memcached.host")) {
+            String s = prop.getProperty("memcached.host");
+            if (!s.contains(":")) {
+                s = s + ":11211";
+            }
+            conf.hosts = AddrUtil.getAddresses(s);
         } else {
             int n = 1;
             String addresses = "";
             while (prop.containsKey("memcached." + n + ".host")) {
-                addresses += prop.getProperty("memcached." + n + ".host") + " ";
+                String s = prop.getProperty("memcached." + n + ".host");
+                if (!s.contains(":")) {
+                    s = s + ":11211";
+                }
+                addresses += s + " ";
             }
             if (S.notEmpty(addresses)) {
                 conf.hosts = AddrUtil.getAddresses(addresses);

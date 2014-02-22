@@ -23,8 +23,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.osgl.cache.CacheService;
 
-import java.io.Serializable;
-
 /**
  * Created by luog on 17/02/14.
  */
@@ -36,7 +34,7 @@ public enum EhCacheService implements CacheService {
 
     net.sf.ehcache.Cache cache;
 
-    private static final String cacheName = "rythm";
+    private static final String cacheName = "osgl-cache";
 
     private int defaultTTL = 60;
 
@@ -44,10 +42,14 @@ public enum EhCacheService implements CacheService {
         this.cacheManager = CacheManager.create();
         this.cacheManager.addCache(cacheName);
         this.cache = cacheManager.getCache(cacheName);
+        long l = this.cache.getCacheConfiguration().getTimeToLiveSeconds();
+        if (0 != l) {
+            defaultTTL = (int)l;
+        }
     }
 
     @Override
-    public void put(String key, Serializable value, int ttl) {
+    public void put(String key, Object value, int ttl) {
         Element element = new Element(key, value);
         if (0 >= ttl) ttl = defaultTTL;
         element.setTimeToLive(ttl);
@@ -55,7 +57,7 @@ public enum EhCacheService implements CacheService {
     }
 
     @Override
-    public void put(String key, Serializable value) {
+    public void put(String key, Object value) {
         put(key, value, defaultTTL);
     }
 
@@ -65,9 +67,12 @@ public enum EhCacheService implements CacheService {
     }
 
     @Override
-    public Serializable get(String key) {
+    public <T> T get(String key) {
         Element e = cache.get(key);
-        return null == e ? null : e.getValue();
+        if (null == e) {
+            return null;
+        }
+        return (T) e.getObjectValue();
     }
 
     @Override

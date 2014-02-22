@@ -27,6 +27,7 @@ import org.osgl.cache.impl.SimpleCacheService;
  * Created by luog on 17/02/14.
  */
 public interface CacheServiceFactory {
+
     CacheService get();
 
     public static enum Impl implements CacheServiceFactory {
@@ -49,6 +50,7 @@ public interface CacheServiceFactory {
                 return fact.get();
             }
         },
+
         Memcached() {
             @Override
             public CacheService get() {

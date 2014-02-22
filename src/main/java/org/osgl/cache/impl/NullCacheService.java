@@ -21,8 +21,6 @@ package org.osgl.cache.impl;
 
 import org.osgl.cache.CacheService;
 
-import java.io.Serializable;
-
 /**
  * A do-nothing implementation of {@link org.osgl.cache.CacheService}
  */
@@ -31,12 +29,12 @@ public enum NullCacheService implements CacheService {
     INSTANCE;
 
     @Override
-    public void put(String key, Serializable value, int ttl) {
+    public void put(String key, Object value, int ttl) {
 
     }
 
     @Override
-    public void put(String key, Serializable value) {
+    public void put(String key, Object value) {
 
     }
 
@@ -46,7 +44,7 @@ public enum NullCacheService implements CacheService {
     }
 
     @Override
-    public Serializable get(String key) {
+    public <T> T get(String key) {
         return null;
     }
 

@@ -29,6 +29,7 @@ import org.osgl.cache.CacheService;
 import org.osgl.exception.ConfigurationException;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
+import org.osgl.util.E;
 import org.osgl.util.S;
 
 import java.io.*;
@@ -52,18 +53,22 @@ public class MemcachedService implements CacheService {
 
     private int defaultTTL = 60;
 
-    public static MemcachedService getInstance() throws IOException {
-      return getInstance(false);
+    public static MemcachedService getInstance() {
+        return getInstance(false);
     }
 
-    public static MemcachedService getInstance(boolean forceClientInit) throws IOException {
-        if (null == instance) {
-            instance = new MemcachedService();
-        } else if (forceClientInit) {
-            // When you stop the client, it sets the interrupted state of this thread to true. If you try to reinit it with the same thread in this state,
-            // Memcached client errors out. So a simple call to interrupted() will reset this flag
-            Thread.interrupted();
-            instance.initClient();
+    public static MemcachedService getInstance(boolean forceClientInit) {
+        try {
+            if (null == instance) {
+                instance = new MemcachedService();
+            } else if (forceClientInit) {
+                // When you stop the client, it sets the interrupted state of this thread to true. If you try to reinit it with the same thread in this state,
+                // Memcached client errors out. So a simple call to interrupted() will reset this flag
+                Thread.interrupted();
+                instance.initClient();
+            }
+        } catch (IOException e) {
+            throw E.ioException(e);
         }
         return instance;
     }
@@ -118,11 +123,11 @@ public class MemcachedService implements CacheService {
 
             // Use plain SASL to connect to memcached
             AuthDescriptor ad = new AuthDescriptor(new String[]{"PLAIN"},
-                                    new PlainCallbackHandler(username, password));
+                    new PlainCallbackHandler(username, password));
             ConnectionFactory cf = new ConnectionFactoryBuilder()
-                                        .setProtocol(ConnectionFactoryBuilder.Protocol.BINARY)
-                                        .setAuthDescriptor(ad)
-                                        .build();
+                    .setProtocol(ConnectionFactoryBuilder.Protocol.BINARY)
+                    .setAuthDescriptor(ad)
+                    .build();
             client = new MemcachedClient(cf, addrs);
         } else {
             client = new MemcachedClient(addrs);
@@ -130,12 +135,12 @@ public class MemcachedService implements CacheService {
     }
 
     @Override
-    public void put(String key, Serializable value, int ttl) {
+    public void put(String key, Object value, int ttl) {
         client.set(key, ttl, value, tc);
     }
 
     @Override
-    public void put(String key, Serializable value) {
+    public void put(String key, Object value) {
         client.set(key, defaultTTL, value);
     }
 
@@ -145,10 +150,10 @@ public class MemcachedService implements CacheService {
     }
 
     @Override
-    public Serializable get(String key) {
+    public <T> T get(String key) {
         Future<Object> future = client.asyncGet(key, tc);
         try {
-            return (Serializable)future.get(1, TimeUnit.SECONDS);
+            return (T) future.get(1, TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(false);
         }
@@ -168,11 +173,9 @@ public class MemcachedService implements CacheService {
 
     @Override
     public void shutdown() {
-        client.shutdown();
     }
 
     @Override
     public void startup() {
-
     }
 }

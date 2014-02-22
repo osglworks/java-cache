@@ -23,7 +23,6 @@ import org.osgl.cache.CacheService;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 
-import java.io.Serializable;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -37,9 +36,9 @@ public enum SimpleCacheService implements CacheService {
     INSTANCE;
 
     private static final Logger logger = L.get(SimpleCacheService.class);
-    private static final AtomicInteger threadNumber = new AtomicInteger(1);
 
     private static class TimerThreadFactory implements ThreadFactory {
+        private static final AtomicInteger threadNumber = new AtomicInteger(1);
         @Override
         public Thread newThread(Runnable r) {
             SecurityManager s = System.getSecurityManager();
@@ -64,11 +63,11 @@ public enum SimpleCacheService implements CacheService {
 
     private static class Item implements Comparable<Item> {
         String key;
-        Serializable value;
+        Object value;
         long ts;
         int ttl;
 
-        Item(String key, Serializable value, int ttl) {
+        Item(String key, Object value, int ttl) {
             this.key = key;
             this.value = value;
             this.ttl = ttl;
@@ -85,7 +84,7 @@ public enum SimpleCacheService implements CacheService {
     private Queue<Item> items_ = new PriorityQueue<Item>();
 
     @Override
-    public void put(String key, Serializable value, int ttl) {
+    public void put(String key, Object value, int ttl) {
         if (null == key) throw new NullPointerException();
         if (0 >= ttl) {
             ttl = defaultTTL;
@@ -107,7 +106,7 @@ public enum SimpleCacheService implements CacheService {
     }
 
     @Override
-    public void put(String key, Serializable value) {
+    public void put(String key, Object value) {
         put(key, value, defaultTTL);
     }
 
@@ -123,9 +122,12 @@ public enum SimpleCacheService implements CacheService {
     }
     
     @Override
-    public Serializable get(String key) {
+    public <T> T get(String key) {
         Item item = cache_.get(key);
-        return null == item ? null : item.value;
+        if (null == item) {
+            return null;
+        }
+        return (T)item.value;
     }
 
     private int defaultTTL = 60;

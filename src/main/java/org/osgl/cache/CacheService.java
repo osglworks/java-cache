@@ -19,8 +19,6 @@
 */
 package org.osgl.cache;
 
-import java.io.Serializable;
-
 /**
  * Defines a cache service
  */
@@ -34,7 +32,7 @@ public interface CacheService {
      *              If set to negative number, then it will never expire.
      *              If set to zero then the default ttl value will be used
      */
-    void put(String key, Serializable value, int ttl);
+    void put(String key, Object value, int ttl);
 
     /**
      * Store an item into the cache by key and use default ttl
@@ -42,7 +40,7 @@ public interface CacheService {
      * @param key
      * @param value
      */
-    void put(String key, Serializable value);
+    void put(String key, Object value);
 
     /**
      * Remove an item from the cache service by key
@@ -56,7 +54,7 @@ public interface CacheService {
      * @param key
      * @return the value associated with the key
      */
-    Serializable get(String key);
+    <T> T get(String key);
 
     /**
      * Remove all cached items
