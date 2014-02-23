@@ -31,13 +31,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A simple cache service implementation based on concurrent hash map
  */
-public enum SimpleCacheService implements CacheService {
+public class SimpleCacheService implements CacheService {
 
-    INSTANCE;
+    private static CacheService INSTANCE = null;
+
+    private String name;
 
     private static final Logger logger = L.get(SimpleCacheService.class);
 
     private static class TimerThreadFactory implements ThreadFactory {
+        private String name;
+        TimerThreadFactory(String name) {
+            this.name = name;
+        }
         private static final AtomicInteger threadNumber = new AtomicInteger(1);
         @Override
         public Thread newThread(Runnable r) {
@@ -57,7 +63,8 @@ public enum SimpleCacheService implements CacheService {
 
     private ScheduledExecutorService scheduler = null;
 
-    private SimpleCacheService() {
+    SimpleCacheService(String name) {
+        this.name = name;
         startup();
     }
 
@@ -150,7 +157,7 @@ public enum SimpleCacheService implements CacheService {
     @Override
     public synchronized void startup() {
         if (null == scheduler) {
-            scheduler = new ScheduledThreadPoolExecutor(1, new TimerThreadFactory());
+            scheduler = new ScheduledThreadPoolExecutor(1, new TimerThreadFactory(name));
             scheduler.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
@@ -177,13 +184,13 @@ public enum SimpleCacheService implements CacheService {
                     }
                 }
             }, 0, 100, TimeUnit.MILLISECONDS);
+            Runtime.getRuntime().addShutdownHook(new Thread(){
+                @Override
+                public void run() {
+                    shutdown();
+                }
+            });
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                shutdown();
-            }
-        });
     }
 
 }

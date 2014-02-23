@@ -20,14 +20,30 @@
 package org.osgl.cache.impl;
 
 import org.osgl.cache.CacheService;
-import org.osgl.cache.CacheServiceFactory;
+import org.osgl.cache.CacheServiceProvider;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Returns instance of {@link org.osgl.cache.impl.EhCacheService}
  */
-class EhCacheServiceFactory implements CacheServiceFactory {
+public class EhCacheServiceProvider implements CacheServiceProvider {
+    public static EhCacheServiceProvider INSTANCE = new EhCacheServiceProvider();
+    private static ConcurrentMap<String, CacheService> services = new ConcurrentHashMap<String, CacheService>();
+
     @Override
     public CacheService get() {
-        return EhCacheService.INSTANCE;
+        return get(CacheService.DEF_CACHE_NAME);
+    }
+
+    @Override
+    public CacheService get(String name) {
+        CacheService cs = services.get(name);
+        if (null == cs) {
+            cs = new EhCacheService(name);
+            services.putIfAbsent(name, cs);
+        }
+        return cs;
     }
 }

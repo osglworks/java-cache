@@ -19,29 +19,37 @@
 */
 package org.osgl.cache.impl;
 
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.osgl.cache.CacheService;
+import org.osgl.util.S;
 
 /**
  * Created by luog on 17/02/14.
  */
-public enum EhCacheService implements CacheService {
+public class EhCacheService implements CacheService {
 
-    INSTANCE;
+    private volatile static EhCacheService INSTANCE = null;
 
     CacheManager cacheManager;
 
     net.sf.ehcache.Cache cache;
 
-    private static final String cacheName = "osgl-cache";
+    private String cacheName = DEF_CACHE_NAME;
 
     private int defaultTTL = 60;
 
-    private EhCacheService() {
-        this.cacheManager = CacheManager.create();
-        this.cacheManager.addCache(cacheName);
-        this.cache = cacheManager.getCache(cacheName);
+    EhCacheService(String name) {
+        if (S.notEmpty(name)) {
+            cacheName = name;
+        }
+        cacheManager = CacheManager.create();
+        Cache cache = cacheManager.getCache(cacheName);
+        if (null == cache) {
+            cache = (Cache)cacheManager.addCacheIfAbsent(cacheName);
+        }
+        this.cache = cache;
         long l = this.cache.getCacheConfiguration().getTimeToLiveSeconds();
         if (0 != l) {
             defaultTTL = (int)l;
@@ -93,5 +101,16 @@ public enum EhCacheService implements CacheService {
 
     @Override
     public void startup() {
+    }
+
+    static CacheService defaultInstance() {
+        if (null == INSTANCE) {
+            synchronized (CacheService.class) {
+                if (null == INSTANCE) {
+                    INSTANCE = new EhCacheService(DEF_CACHE_NAME);
+                }
+            }
+        }
+        return INSTANCE;
     }
 }

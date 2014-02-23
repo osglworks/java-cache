@@ -23,6 +23,9 @@ package org.osgl.cache;
  * Defines a cache service
  */
 public interface CacheService {
+
+    public static final String DEF_CACHE_NAME = "osgl-cache";
+
     /**
      * Store an item into the cache service by key and set ttl value
      *
@@ -63,6 +66,8 @@ public interface CacheService {
 
     /**
      * Set default ttl value which will be used if user pass 0 as ttl or not specified ttl
+     * Note some service might not favor this method after the internal cache service
+     * is initialized. E.g. memcached and ehcaches
      *
      * @param ttl
      */
