@@ -1,5 +1,5 @@
-java-cache
-==========
+java-cache v0.1
+===============
 
 A simple cache api supports the following cache services
 
