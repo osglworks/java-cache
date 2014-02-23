@@ -21,7 +21,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-cache</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
 
     <name>OSGL Cache API</name>
     <description>A simple java cache API</description>
