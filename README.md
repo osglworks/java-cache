@@ -62,7 +62,7 @@ Cache.put(key, object);
 object = Cache.get(key);
 Cache.evict(key);
 Cache.shutdown();
-``
+```
 
 ### Configuration
 
