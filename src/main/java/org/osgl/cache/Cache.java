@@ -1,7 +1,5 @@
 package org.osgl.cache;
 
-import java.io.Serializable;
-
 /**
  * The Cache service static facade which delegate the operations
  * to the default cache service created by auto discovered cache
@@ -31,15 +29,15 @@ public enum Cache {
         c().shutdown();
     }
 
-    public static void put(String key, Serializable value, int ttl) {
+    public static void put(String key, Object value, int ttl) {
         c().put(key, value, ttl);
     }
 
-    public static void put(String key, Serializable value) {
+    public static void put(String key, Object value) {
         c().put(key, value);
     }
 
-    public static Object get(String key) {
+    public static <T> T get(String key) {
         return c().get(key);
     }
 

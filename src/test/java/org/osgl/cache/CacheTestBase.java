@@ -53,9 +53,9 @@ public abstract class CacheTestBase extends TestBase {
         logger.trace("*****************************************");
         cache().put("key1", "val2", 2);
         assertEquals("val2", cache().get("key1"));
-        Thread.sleep(1400);
+        Thread.sleep(1200);
         assertEquals("val2", cache().get("key1"));
-        Thread.sleep(850);
+        Thread.sleep(900);
         logger.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         assertEquals(null, cache().get("key1"));
     }

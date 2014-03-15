@@ -52,7 +52,7 @@ public class SimpleCacheService implements CacheService {
 
             Thread t = new Thread(group, r, "simple-cache-service-" + threadNumber.getAndIncrement(), 0);
             if (t.isDaemon()) {
-                t.setDaemon(false);
+                t.setDaemon(true);
             }
             if (t.getPriority() != Thread.NORM_PRIORITY) {
                 t.setPriority(Thread.NORM_PRIORITY);
