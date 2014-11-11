@@ -162,8 +162,11 @@ public class SimpleCacheService implements CacheService {
                     if (items_.size() == 0) {
                         return;
                     }
+                    boolean trace = logger.isTraceEnabled();
                     long now = System.currentTimeMillis();
-                    logger.trace(">>>>now:%s", now);
+                    if (trace) {
+                        logger.trace(">>>>now:%s", now);
+                    }
                     while(true) {
                         Item item = items_.peek();
                         if (null == item) {
@@ -173,10 +176,14 @@ public class SimpleCacheService implements CacheService {
                         if ((ts) < now + 50) {
                             items_.poll();
                             cache_.remove(item.key);
-                            logger.trace("- %s at %s", item.key, ts);
+                            if (trace) {
+                                logger.trace("- %s at %s", item.key, ts);
+                            }
                             continue;
                         } else {
-                            logger.trace(">>>>ts:  %s", ts);
+                            if (trace) {
+                                logger.trace(">>>>ts:  %s", ts);
+                            }
                         }
                         break;
                     }

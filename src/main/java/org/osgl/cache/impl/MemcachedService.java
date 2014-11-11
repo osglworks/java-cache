@@ -172,10 +172,21 @@ public class MemcachedService implements CacheService {
     }
 
     @Override
-    public void shutdown() {
+    public synchronized void shutdown() {
+        if (null != client) {
+            client.shutdown();
+            client = null;
+        }
     }
 
     @Override
-    public void startup() {
+    public synchronized void startup() {
+        if (null == client) {
+            try {
+                initClient();
+            } catch (IOException e) {
+                throw E.ioException(e);
+            }
+        }
     }
 }
