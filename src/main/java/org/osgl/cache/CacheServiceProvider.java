@@ -22,6 +22,7 @@ package org.osgl.cache;
 import org.osgl._;
 import org.osgl.cache.impl.NullCacheService;
 import org.osgl.cache.impl.SimpleCacheServiceProvider;
+import org.osgl.util.S;
 
 /**
  * The factory to get CacheService instance
@@ -96,8 +97,40 @@ public interface CacheServiceProvider {
             }
         },
         Auto() {
+            private CacheServiceProvider configured(String name) {
+                if (S.empty(name)) {
+                    name = "osgl.cache.impl";
+                } else {
+                    name = name.toLowerCase().trim();
+                    if (!name.startsWith("osgl.cache.impl.")) {
+                        name = "osgl.cache.impl." + name;
+                    }
+                }
+
+                String cacheImpl = System.getProperty(name);
+                if (S.notEmpty(cacheImpl)) {
+                    try {
+                        return _.newInstance(cacheImpl);
+                    } catch (Exception e) {
+                        try {
+                            CacheServiceProvider csp = Impl.valueOf(cacheImpl);
+                            return (csp == Auto) ? null : csp;
+                        } catch (Exception e2) {
+                            return null;
+                        }
+                    }
+                }
+                return null;
+            }
+            private CacheServiceProvider configured() {
+                return configured(null);
+            }
             @Override
             public CacheService get() {
+                CacheServiceProvider csp = configured();
+                if (null != csp) {
+                    return csp.get();
+                }
                 try {
                     return Memcached.get();
                 } catch (Throwable e) {
@@ -113,6 +146,10 @@ public interface CacheServiceProvider {
 
             @Override
             public CacheService get(String name) {
+                CacheServiceProvider csp = configured(name);
+                if (null != csp) {
+                    return csp.get();
+                }
                 try {
                     return Memcached.get(name);
                 } catch (Throwable e) {
