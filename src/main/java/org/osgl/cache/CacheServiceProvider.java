@@ -98,7 +98,7 @@ public interface CacheServiceProvider {
         },
         Auto() {
             private CacheServiceProvider configured(String name) {
-                if (S.empty(name)) {
+                if (S.blank(name)) {
                     name = "osgl.cache.impl";
                 } else {
                     name = name.toLowerCase().trim();
@@ -108,12 +108,12 @@ public interface CacheServiceProvider {
                 }
 
                 String cacheImpl = System.getProperty(name);
-                if (S.notEmpty(cacheImpl)) {
+                if (S.notBlank(cacheImpl)) {
                     try {
                         return _.newInstance(cacheImpl);
                     } catch (Exception e) {
                         try {
-                            CacheServiceProvider csp = Impl.valueOf(cacheImpl);
+                            CacheServiceProvider csp = Impl.valueOfIgnoreCase(cacheImpl);
                             return (csp == Auto) ? null : csp;
                         } catch (Exception e2) {
                             return null;
@@ -162,6 +162,24 @@ public interface CacheServiceProvider {
                 }
                 return Simple.get(name);
             }
+        };
+
+        public static CacheServiceProvider valueOfIgnoreCase(String name) {
+            if (S.blank(name)) {
+                return null;
+            }
+            name = name.trim().toLowerCase().intern();
+            if (name == NoCache.name().intern()) {
+                return NoCache;
+            } else if (name == Simple.name().toLowerCase().intern()) {
+                return Simple;
+            } else if (name == Memcached.name().toLowerCase().intern()) {
+                return Memcached;
+            } else if (name == EhCache.name().toLowerCase().intern()) {
+                return EhCache;
+            }
+            return null;
         }
     }
+
 }

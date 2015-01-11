@@ -67,7 +67,7 @@ public class MemcachedClientConfigurator {
                 }
                 addresses += s + " ";
             }
-            if (S.notEmpty(addresses)) {
+            if (S.notBlank(addresses)) {
                 conf.hosts = AddrUtil.getAddresses(addresses);
             }
         }

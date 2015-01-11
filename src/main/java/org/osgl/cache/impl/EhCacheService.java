@@ -41,7 +41,7 @@ public class EhCacheService implements CacheService {
     private int defaultTTL = 60;
 
     EhCacheService(String name) {
-        if (S.notEmpty(name)) {
+        if (S.notBlank(name)) {
             cacheName = name;
         }
         cacheManager = CacheManager.create();

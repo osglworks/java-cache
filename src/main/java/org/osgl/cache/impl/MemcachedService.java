@@ -115,7 +115,7 @@ public class MemcachedService implements CacheService {
             throw new ConfigurationException("Bad configuration for memcached: missing host(s)");
         }
         String username = MemcachedClientConfigurator.getUsername();
-        if (S.notEmpty(username)) {
+        if (S.notBlank(username)) {
             String password = MemcachedClientConfigurator.getPassword();
             if (null == password) {
                 throw new ConfigurationException("Bad configuration for memcached: missing password");
