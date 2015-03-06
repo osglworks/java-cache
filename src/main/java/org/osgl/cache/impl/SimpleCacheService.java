@@ -19,6 +19,7 @@
 */
 package org.osgl.cache.impl;
 
+import org.osgl._;
 import org.osgl.cache.CacheService;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
@@ -76,7 +77,7 @@ public class SimpleCacheService implements CacheService {
             this.key = key;
             this.value = value;
             this.ttl = ttl;
-            this.ts = System.currentTimeMillis();
+            this.ts = _.ms();
         }
         
         @Override
@@ -101,12 +102,14 @@ public class SimpleCacheService implements CacheService {
             if (null != item) {
                 item.value = value;
                 item.ttl = ttl;
+                item.ts = _.ms();
             } else {
                 items_.offer(newItem);
             }
         } else {
             item.value = value;
             item.ttl = ttl;
+            item.ts = _.ms();
         }
     }
 
