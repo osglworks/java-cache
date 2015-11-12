@@ -24,6 +24,9 @@
 
 0.3.1-SNAPSHOT
 - Fix issue: SimpleCacheService.put(xxx) failed to update timestamp of the item thus will not refresh the timeout
+
+0.3.2-SNAPSHOT
+- Upgrade to osgl-tool 0.7.1-SNAPSHOT
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -32,7 +35,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-cache</artifactId>
     <packaging>jar</packaging>
-    <version>0.3.1-SNAPSHOT</version>
+    <version>0.3.2-SNAPSHOT</version>
 
     <name>OSGL Cache API</name>
     <description>A simple java cache API</description>
@@ -101,13 +104,13 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.7.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
         	<groupId>org.osgl</groupId>
         	<artifactId>osgl-logging</artifactId>
-        	<version>0.2</version>
+        	<version>0.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
