@@ -19,7 +19,7 @@
 */
 package org.osgl.cache;
 
-import org.osgl._;
+import org.osgl.$;
 import org.osgl.cache.impl.NullCacheService;
 import org.osgl.cache.impl.SimpleCacheServiceProvider;
 import org.osgl.util.S;
@@ -72,13 +72,13 @@ public interface CacheServiceProvider {
         EhCache() {
             @Override
             public CacheService get() {
-                CacheServiceProvider fact = _.newInstance("org.osgl.cache.impl.EhCacheServiceProvider");
+                CacheServiceProvider fact = $.newInstance("org.osgl.cache.impl.EhCacheServiceProvider");
                 return fact.get();
             }
 
             @Override
             public CacheService get(String name) {
-                CacheServiceProvider fact = _.newInstance("org.osgl.cache.impl.EhCacheServiceProvider");
+                CacheServiceProvider fact = $.newInstance("org.osgl.cache.impl.EhCacheServiceProvider");
                 return fact.get(name);
             }
         },
@@ -86,13 +86,13 @@ public interface CacheServiceProvider {
         Memcached() {
             @Override
             public CacheService get() {
-                CacheServiceProvider fact = _.newInstance("org.osgl.cache.impl.MemcachedServiceProvider");
+                CacheServiceProvider fact = $.newInstance("org.osgl.cache.impl.MemcachedServiceProvider");
                 return fact.get();
             }
 
             @Override
             public CacheService get(String name) {
-                CacheServiceProvider fact = _.newInstance("org.osgl.cache.impl.MemcachedServiceProvider");
+                CacheServiceProvider fact = $.newInstance("org.osgl.cache.impl.MemcachedServiceProvider");
                 return fact.get(name);
             }
         },
@@ -110,7 +110,7 @@ public interface CacheServiceProvider {
                 String cacheImpl = System.getProperty(name);
                 if (S.notBlank(cacheImpl)) {
                     try {
-                        return _.newInstance(cacheImpl);
+                        return $.newInstance(cacheImpl);
                     } catch (Exception e) {
                         try {
                             CacheServiceProvider csp = Impl.valueOfIgnoreCase(cacheImpl);
