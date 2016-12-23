@@ -1,8 +1,8 @@
 package org.osgl.cache;
 
-/**
- * Created by luog on 22/02/14.
- */
+import org.junit.Ignore;
+
+@Ignore
 public class MemcachedTest extends CacheTestBase {
     @Override
     protected CacheService cache() {
