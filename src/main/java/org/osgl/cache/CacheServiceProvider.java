@@ -177,6 +177,8 @@ public interface CacheServiceProvider {
                 return Memcached;
             } else if (name == EhCache.name().toLowerCase().intern()) {
                 return EhCache;
+            } else if (name == Auto.name().toLowerCase().intern()) {
+                return Auto;
             }
             return null;
         }
