@@ -15,6 +15,9 @@
   ~ under the License.
   -->
 <!-- versions
+1.0.1
+- Use version range for osgl dependencies
+
 1.0.0
 - baseline from 0.5.0
 
@@ -47,7 +50,7 @@
   <groupId>org.osgl</groupId>
   <artifactId>osgl-cache</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <name>OSGL Cache API</name>
   <description>A simple java cache API</description>
@@ -68,7 +71,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <osgl-logging.version>1.0.0</osgl-logging.version>
+    <osgl-logging.version>[1.0.0, 2.0.0)</osgl-logging.version>
     <spymemcached.version>2.12.2</spymemcached.version>
     <ehcache.version>2.10.3</ehcache.version>
     <maven.test.skip>false</maven.test.skip>
