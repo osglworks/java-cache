@@ -53,7 +53,7 @@
   <groupId>org.osgl</groupId>
   <artifactId>osgl-cache</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
 
   <name>OSGL Cache API</name>
   <description>A simple java cache API</description>
