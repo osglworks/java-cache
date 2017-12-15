@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A simple cache service implementation based on concurrent hash map
  */
-public class SimpleCacheService implements CacheService {
+public class SimpleCacheService extends CacheServiceBase {
 
     private static CacheService INSTANCE = null;
 
@@ -122,6 +122,7 @@ public class SimpleCacheService implements CacheService {
     public void evict(String key) {
         cache_.remove(key);
     }
+
 
     @Override
     public void clear() {

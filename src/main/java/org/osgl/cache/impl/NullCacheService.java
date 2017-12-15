@@ -49,6 +49,27 @@ public enum NullCacheService implements CacheService {
     }
 
     @Override
+    public void incr(String s) {
+
+    }
+
+    @Override
+    public void incr(String s, int i) {
+
+    }
+
+    @Override
+    public void decr(String s) {
+
+    }
+
+    @Override
+    public void decr(String s, int i) {
+
+    }
+
+
+    @Override
     public void clear() {
 
     }

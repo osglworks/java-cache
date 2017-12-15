@@ -28,7 +28,7 @@ import org.osgl.util.S;
 /**
  * Created by luog on 17/02/14.
  */
-public class EhCacheService implements CacheService {
+public class EhCacheService extends CacheServiceBase {
 
     private volatile static EhCacheService INSTANCE = null;
 

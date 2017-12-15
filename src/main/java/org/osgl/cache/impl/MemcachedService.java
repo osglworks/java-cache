@@ -25,7 +25,6 @@ import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
 import net.spy.memcached.transcoders.SerializingTranscoder;
-import org.osgl.cache.CacheService;
 import org.osgl.exception.ConfigurationException;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The code of this implementation comes from Play!Framework 1.x
  */
-public class MemcachedService implements CacheService {
+public class MemcachedService extends CacheServiceBase {
 
     private static Logger logger = L.get(MemcachedService.class);
 
