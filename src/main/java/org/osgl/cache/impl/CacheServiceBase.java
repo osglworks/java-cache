@@ -4,57 +4,57 @@ import org.osgl.cache.CacheService;
 
 abstract class CacheServiceBase implements CacheService {
     @Override
-    public void incr(String key) {
+    public int incr(String key) {
         Object o = get(key);
         if (null == o) {
             put(key, 1);
+            return 0;
         }
         if (o instanceof Integer) {
             put(key, ((Integer) o).intValue() + 1);
-        } else if (o instanceof Long) {
-            put(key, ((Long) o).longValue() + 1);
+            return (Integer) o;
         }
         throw new IllegalStateException("Only int or long value support incr operation");
     }
 
     @Override
-    public void incr(String key, int n) {
+    public int incr(String key, int n) {
         Object o = get(key);
         if (null == o) {
             put(key, n);
+            return 0;
         }
         if (o instanceof Integer) {
             put(key, ((Integer) o).intValue() + n);
-        } else if (o instanceof Long) {
-            put(key, ((Long) o).longValue() + n);
+            return (Integer) o;
         }
         throw new IllegalStateException("Only int or long value support incr operation");
     }
 
     @Override
-    public void decr(String key) {
+    public int decr(String key) {
         Object o = get(key);
         if (null == o) {
             put(key, -1);
+            return 0;
         }
         if (o instanceof Integer) {
             put(key, ((Integer) o).intValue() - 1);
-        } else if (o instanceof Long) {
-            put(key, ((Long) o).longValue() - 1);
+            return (Integer)o;
         }
         throw new IllegalStateException("Only int or long value support decr operation");
     }
 
     @Override
-    public void decr(String key, int n) {
+    public int decr(String key, int n) {
         Object o = get(key);
         if (null == o) {
             put(key, -n);
+            return 0;
         }
         if (o instanceof Integer) {
             put(key, ((Integer) o).intValue() - n);
-        } else if (o instanceof Long) {
-            put(key, ((Long) o).longValue() - n);
+            return (Integer)o;
         }
         throw new IllegalStateException("Only int or long value support decr operation");
     }
