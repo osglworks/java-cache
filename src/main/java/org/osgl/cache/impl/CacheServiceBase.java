@@ -18,14 +18,14 @@ abstract class CacheServiceBase implements CacheService {
     }
 
     @Override
-    public int incr(String key, int n) {
+    public int incr(String key, int ttl) {
         Object o = get(key);
         if (null == o) {
-            put(key, n);
+            put(key, 1, ttl);
             return 0;
         }
         if (o instanceof Integer) {
-            put(key, ((Integer) o).intValue() + n);
+            put(key, ((Integer) o).intValue() + 1, ttl);
             return (Integer) o;
         }
         throw new IllegalStateException("Only int or long value support incr operation");
@@ -46,14 +46,14 @@ abstract class CacheServiceBase implements CacheService {
     }
 
     @Override
-    public int decr(String key, int n) {
+    public int decr(String key, int ttl) {
         Object o = get(key);
         if (null == o) {
-            put(key, -n);
+            put(key, -1, ttl);
             return 0;
         }
         if (o instanceof Integer) {
-            put(key, ((Integer) o).intValue() - n);
+            put(key, ((Integer) o).intValue() - 1, ttl);
             return (Integer)o;
         }
         throw new IllegalStateException("Only int or long value support decr operation");
