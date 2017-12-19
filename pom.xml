@@ -35,6 +35,7 @@
 
   <properties>
     <scm.url>git@github.com:osglworks/java-tool.git</scm.url>
+    <osgl-tool.version>1.5.0</osgl-tool.version>
     <osgl-logging.version>1.1.0</osgl-logging.version>
     <spymemcached.version>2.12.2</spymemcached.version>
     <ehcache.version>2.10.3</ehcache.version>
@@ -58,6 +59,14 @@
       <groupId>org.osgl</groupId>
       <artifactId>osgl-logging</artifactId>
       <version>${osgl-logging.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgl</groupId>
+      <artifactId>osgl-tool</artifactId>
+      <version>${osgl-tool.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
