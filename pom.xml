@@ -34,7 +34,7 @@
   </parent>
 
   <properties>
-    <scm.url>git@github.com:osglworks/java-logging.git</scm.url>
+    <scm.url>git@github.com:osglworks/java-cache.git</scm.url>
     <osgl-tool.version>1.5.0</osgl-tool.version>
     <osgl-logging.version>1.1.0</osgl-logging.version>
     <spymemcached.version>2.12.2</spymemcached.version>
