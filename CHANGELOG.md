@@ -1,5 +1,9 @@
 # OSGL Cache Change Log
 
+1.2.0 - 
+- catch up to osgl-tool-1.6
+- support configure classloader #1
+
 1.1.0 - 19/Dec/2017
 - catch up osgl-tool-1.5.0
 - support incr and decr operation

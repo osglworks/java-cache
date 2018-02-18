@@ -45,6 +45,7 @@ import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
 import net.spy.memcached.transcoders.SerializingTranscoder;
+import org.osgl.cache.CacheServiceProvider;
 import org.osgl.exception.ConfigurationException;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
@@ -101,7 +102,7 @@ public class MemcachedService extends CacheServiceBase {
                         @Override
                         protected Class<?> resolveClass(ObjectStreamClass desc)
                                 throws IOException, ClassNotFoundException {
-                            return Class.forName(desc.getName(), false, Thread.currentThread().getContextClassLoader());
+                            return Class.forName(desc.getName(), false, CacheServiceProvider.Impl.classLoader());
                         }
                     }.readObject();
                 } catch (Exception e) {

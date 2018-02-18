@@ -65,7 +65,7 @@ public interface CacheServiceProvider {
      */
     CacheService get(String name);
 
-    public static enum Impl implements CacheServiceProvider {
+    enum Impl implements CacheServiceProvider {
         NoCache() {
             @Override
             public CacheService get() {
@@ -183,6 +183,23 @@ public interface CacheServiceProvider {
                 return Simple.get(name);
             }
         };
+
+        private static volatile ClassLoader classLoader;
+
+        public static ClassLoader classLoader() {
+            if (null == classLoader) {
+                synchronized (CacheServiceProvider.class) {
+                    if (null == classLoader) {
+                        classLoader = Thread.currentThread().getContextClassLoader();
+                    }
+                }
+            }
+            return classLoader;
+        }
+
+        public static void setClassLoader(ClassLoader classLoader) {
+            Impl.classLoader = $.notNull(classLoader);
+        }
 
         public static CacheServiceProvider valueOfIgnoreCase(String name) {
             if (S.blank(name)) {

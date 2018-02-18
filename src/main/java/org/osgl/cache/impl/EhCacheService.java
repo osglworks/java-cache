@@ -42,7 +42,10 @@ package org.osgl.cache.impl;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
 import org.osgl.cache.CacheService;
+import org.osgl.cache.CacheServiceProvider;
 import org.osgl.util.S;
 
 /**
@@ -64,7 +67,9 @@ public class EhCacheService extends CacheServiceBase {
         if (S.notBlank(name)) {
             cacheName = name;
         }
-        cacheManager = CacheManager.create();
+        Configuration configuration = ConfigurationFactory.parseConfiguration();
+        configuration.setClassLoader(CacheServiceProvider.Impl.classLoader());
+        cacheManager = CacheManager.create(configuration);
         Cache cache = cacheManager.getCache(cacheName);
         if (null == cache) {
             cache = (Cache)cacheManager.addCacheIfAbsent(cacheName);
