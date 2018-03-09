@@ -102,6 +102,9 @@ public class SimpleCacheService extends CacheServiceBase {
         
         @Override
         public int compareTo(Item that) {
+            if (null == that) {
+                return -1;
+            }
             return ttl - that.ttl;
         }
     }

@@ -1,5 +1,9 @@
 # OSGL Cache Change Log
 
+1.2.1 -
+- catch up to osgl-tool-1.7
+- Potential `NullPointerException` in `SimpleCacheService` implementation #2
+
 1.2.0 - 
 - catch up to osgl-tool-1.6
 - support configure classloader #1
