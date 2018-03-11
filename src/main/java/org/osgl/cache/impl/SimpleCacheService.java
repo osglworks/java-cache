@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 The Rythm Engine project
  * Gelin Luo <greenlaw110(at)gmail.com>
  *
@@ -8,15 +8,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 package org.osgl.cache.impl;
 
 /*-
@@ -28,9 +28,9 @@ package org.osgl.cache.impl;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,32 +40,38 @@ package org.osgl.cache.impl;
  */
 
 import org.osgl.$;
-import org.osgl.cache.CacheService;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.*;
+import java.lang.ref.SoftReference;
+import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A simple cache service implementation based on concurrent hash map
  */
 public class SimpleCacheService extends CacheServiceBase {
 
-    private static CacheService INSTANCE = null;
-
     private String name;
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     private static final Logger logger = L.get(SimpleCacheService.class);
 
     private static class TimerThreadFactory implements ThreadFactory {
         private String name;
+
         TimerThreadFactory(String name) {
             this.name = name;
         }
+
         private static final AtomicInteger threadNumber = new AtomicInteger(1);
+
         @Override
         public Thread newThread(Runnable r) {
             SecurityManager s = System.getSecurityManager();
@@ -99,18 +105,39 @@ public class SimpleCacheService extends CacheServiceBase {
             this.ttl = ttl;
             this.ts = $.ms();
         }
-        
+
         @Override
         public int compareTo(Item that) {
             if (null == that) {
-                return -1;
+                return 1;
             }
-            return ttl - that.ttl;
+            long myTs = ts + ttl * 1000;
+            long hisTs = that.ts + that.ttl * 1000;
+            return myTs < hisTs ? -1 : myTs > hisTs ? 1 : key.compareTo(that.key);
         }
     }
 
-    private ConcurrentHashMap<String, Item> cache_ = new ConcurrentHashMap<String, Item>();
-    private Queue<Item> items_ = new PriorityQueue<Item>();
+    private static class SoftItem extends SoftReference<Item> implements Comparable<SoftItem> {
+        public SoftItem(String key, Object value, int ttl) {
+            super(new Item(key, value, ttl));
+        }
+
+        @Override
+        public int compareTo(SoftItem that) {
+            if (null == that) {
+                return 1;
+            }
+            Item myItem = get();
+            if (null == myItem) {
+                return -1;
+            }
+            Item hisItem = that.get();
+            return myItem.compareTo(hisItem);
+        }
+    }
+
+    private Map<String, SoftItem> cache_ = new WeakHashMap<>();
+    private Queue<SoftItem> items_ = new PriorityQueue<>();
 
     @Override
     public void put(String key, Object value, int ttl) {
@@ -118,21 +145,39 @@ public class SimpleCacheService extends CacheServiceBase {
         if (0 >= ttl) {
             ttl = defaultTTL;
         }
-        Item item = cache_.get(key);
-        if (null == item) {
-            Item newItem = new Item(key, value, ttl);
-            item = cache_.putIfAbsent(key, newItem);
-            if (null != item) {
-                item.value = value;
-                item.ttl = ttl;
-                item.ts = $.ms();
-            } else {
+        lock.lock();
+        try {
+            SoftItem item = cache_.get(key);
+            Item item1 = null == item ? null : item.get();
+            if (null == item1) {
+                SoftItem newItem = new SoftItem(key, value, ttl);
+                cache_.put(key, newItem);
                 items_.offer(newItem);
+            } else {
+                item1.value = value;
+                item1.ttl = ttl;
+                item1.ts = $.ms();
+                // so that we can re-position the item in the queue
+                items_.remove(item);
+                items_.offer(item);
             }
-        } else {
-            item.value = value;
-            item.ttl = ttl;
-            item.ts = $.ms();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public <T> T get(String key) {
+        lock.lock();
+        try {
+            SoftItem item = cache_.get(key);
+            if (null == item) {
+                return null;
+            }
+            Item item1 = item.get();
+            return null == item1 ? null : (T) item1.value;
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -143,23 +188,24 @@ public class SimpleCacheService extends CacheServiceBase {
 
     @Override
     public void evict(String key) {
-        cache_.remove(key);
+        lock.lock();
+        try {
+            cache_.remove(key);
+        } finally {
+            lock.unlock();
+        }
     }
 
 
     @Override
     public void clear() {
-        cache_.clear();
-        items_.clear();
-    }
-    
-    @Override
-    public <T> T get(String key) {
-        Item item = cache_.get(key);
-        if (null == item) {
-            return null;
+        lock.lock();
+        try {
+            cache_.clear();
+            items_.clear();
+        } finally {
+            lock.unlock();
         }
-        return (T)item.value;
     }
 
     private int defaultTTL = 60;
@@ -178,7 +224,7 @@ public class SimpleCacheService extends CacheServiceBase {
             scheduler = null;
         }
     }
-    
+
     @Override
     public synchronized void startup() {
         if (null == scheduler) {
@@ -186,7 +232,7 @@ public class SimpleCacheService extends CacheServiceBase {
             scheduler.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    if (items_.size() == 0) {
+                    if (items_.isEmpty()) {
                         return;
                     }
                     boolean trace = logger.isTraceEnabled();
@@ -194,29 +240,48 @@ public class SimpleCacheService extends CacheServiceBase {
                     if (trace) {
                         logger.trace(">>>>now:%s", now);
                     }
-                    while(true) {
-                        Item item = items_.peek();
-                        if (null == item) {
+                    lock.lock();
+                    try {
+                        while (true) {
+                            SoftItem item0 = items_.peek();
+                            if (null == item0) {
+                                break;
+                            }
+                            Item item = item0.get();
+                            if (null == item) {
+                                // garbage collected ?
+                                items_.poll();
+                                continue;
+                            }
+                            long ts = item.ts + item.ttl * 1000;
+                            if ((ts) < now + 50) {
+                                cache_.remove(item.key);
+                                items_.poll();
+                                if (trace) {
+                                    logger.trace("- %s at %s", item.key, ts);
+                                }
+                                continue;
+                            } else {
+                                if (!cache_.containsKey(item.key)) {
+                                    // evicted or garbage collected
+                                    items_.poll();
+                                    if (trace) {
+                                        logger.trace("cached item evicted: %s", item.key);
+                                    }
+                                    continue;
+                                }
+                                if (trace) {
+                                    logger.trace(">>>>ts:  %s", ts);
+                                }
+                            }
                             break;
                         }
-                        long ts = item.ts + item.ttl * 1000;
-                        if ((ts) < now + 50) {
-                            items_.poll();
-                            cache_.remove(item.key);
-                            if (trace) {
-                                logger.trace("- %s at %s", item.key, ts);
-                            }
-                            continue;
-                        } else {
-                            if (trace) {
-                                logger.trace(">>>>ts:  %s", ts);
-                            }
-                        }
-                        break;
+                    } finally {
+                        lock.unlock();
                     }
                 }
             }, 0, 100, TimeUnit.MILLISECONDS);
-            Runtime.getRuntime().addShutdownHook(new Thread(){
+            Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     shutdown();
