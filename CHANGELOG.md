@@ -1,6 +1,9 @@
 # OSGL Cache Change Log
 
-1.3.0 -
+1.3.1 - 25/Mar/2018
+- catch up to osgl-tool-1.8
+
+1.3.0 - 11/Mar/2018
 - catch up to osgl-tool-1.7
 - Implement `SimpleCacheService` with `SoftReference` #3
 - Potential `NullPointerException` in `SimpleCacheService` implementation #2
