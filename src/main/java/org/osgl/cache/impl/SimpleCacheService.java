@@ -44,13 +44,16 @@ import org.osgl.logging.L;
 import org.osgl.logging.Logger;
 
 import java.lang.ref.SoftReference;
-import java.util.*;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A simple cache service implementation based on concurrent hash map
@@ -59,7 +62,9 @@ public class SimpleCacheService extends CacheServiceBase {
 
     private String name;
 
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantReadWriteLock _lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock readLock = _lock.readLock();
+    private final ReentrantReadWriteLock.WriteLock writeLock = _lock.writeLock();
 
     private static final Logger logger = L.get(SimpleCacheService.class);
 
@@ -145,7 +150,7 @@ public class SimpleCacheService extends CacheServiceBase {
         if (0 >= ttl) {
             ttl = defaultTTL;
         }
-        lock.lock();
+        writeLock.lock();
         try {
             SoftItem item = cache_.get(key);
             Item item1 = null == item ? null : item.get();
@@ -162,13 +167,13 @@ public class SimpleCacheService extends CacheServiceBase {
                 items_.offer(item);
             }
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
 
     @Override
     public <T> T get(String key) {
-        lock.lock();
+        readLock.lock();
         try {
             SoftItem item = cache_.get(key);
             if (null == item) {
@@ -177,7 +182,7 @@ public class SimpleCacheService extends CacheServiceBase {
             Item item1 = item.get();
             return null == item1 ? null : (T) item1.value;
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
 
@@ -188,23 +193,23 @@ public class SimpleCacheService extends CacheServiceBase {
 
     @Override
     public void evict(String key) {
-        lock.lock();
+        writeLock.lock();
         try {
             cache_.remove(key);
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
 
 
     @Override
     public void clear() {
-        lock.lock();
+        writeLock.lock();
         try {
             cache_.clear();
             items_.clear();
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
     }
 
@@ -240,7 +245,7 @@ public class SimpleCacheService extends CacheServiceBase {
                     if (trace) {
                         logger.trace(">>>>now:%s", now);
                     }
-                    lock.lock();
+                    writeLock.lock();
                     try {
                         while (true) {
                             SoftItem item0 = items_.peek();
@@ -277,7 +282,7 @@ public class SimpleCacheService extends CacheServiceBase {
                             break;
                         }
                     } finally {
-                        lock.unlock();
+                        writeLock.unlock();
                     }
                 }
             }, 0, 100, TimeUnit.MILLISECONDS);

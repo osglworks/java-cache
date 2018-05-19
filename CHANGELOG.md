@@ -1,4 +1,10 @@
 # OSGL Cache Change Log
+
+1.4.0
+- update to osgl-tool-1.13.0
+- Improve SimpleCacheService implementation with read/write lock
+- update ehcache to 2.10.5
+
 1.3.3 - 02/Apr/2018
 - update osgl-tool to 1.9.0
 
