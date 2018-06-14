@@ -20,7 +20,7 @@
 
   <artifactId>osgl-cache</artifactId>
   <packaging>jar</packaging>
-  <version>1.5.0-SNAPSHOT</version>
+  <version>1.5.0</version>
 
   <name>OSGL Cache API</name>
   <description>A simple java cache API</description>
