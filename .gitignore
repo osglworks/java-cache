@@ -7,3 +7,6 @@
 target
 deploy
 .idea
+.settings
+.project
+.classpath
