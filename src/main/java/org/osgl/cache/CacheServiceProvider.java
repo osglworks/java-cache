@@ -43,11 +43,16 @@ import org.osgl.$;
 import org.osgl.cache.impl.NullCacheService;
 import org.osgl.cache.impl.SimpleCacheServiceProvider;
 import org.osgl.util.S;
+import osgl.version.Version;
+import osgl.version.Versioned;
 
 /**
  * The factory to get CacheService instance
  */
+@Versioned
 public interface CacheServiceProvider {
+
+    Version VERSION = Version.get();
 
     /**
      * Get default cache service instance. The the default cache service

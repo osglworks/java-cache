@@ -2,6 +2,7 @@
 
 1.6.1
 * SimpleCacheServiceProvider - provide interface to reset all cache services #6
+* Versioned by osgl-version
 
 1.6.0 - 30/Oct/2018
 * update to osgl-tool-1.18.0

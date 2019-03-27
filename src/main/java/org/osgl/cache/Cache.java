@@ -20,13 +20,19 @@ package org.osgl.cache;
  * #L%
  */
 
+import osgl.version.Version;
+import osgl.version.Versioned;
+
 /**
  * The Cache service static facade which delegate the operations
  * to the default cache service created by auto discovered cache
  * service factory
  */
+@Versioned
 public enum Cache {
     ;
+
+    public static final Version VERSION = Version.get();
 
     private static volatile CacheService c_;
     private static CacheService c() {
