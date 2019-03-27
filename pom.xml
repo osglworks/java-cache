@@ -37,7 +37,7 @@
     <osgl-tool.version>1.18.0</osgl-tool.version>
     <osgl-logging.version>1.3.0</osgl-logging.version>
     <spymemcached.version>2.12.3</spymemcached.version>
-    <ehcache.version>2.10.5</ehcache.version>
+    <ehcache.version>2.10.6</ehcache.version>
   </properties>
 
   <scm>

@@ -39,6 +39,7 @@ package org.osgl.cache.impl;
  * #L%
  */
 
+import org.osgl.$;
 import org.osgl.cache.CacheService;
 import org.osgl.cache.CacheServiceProvider;
 
@@ -61,7 +62,13 @@ public class EhCacheServiceProvider implements CacheServiceProvider {
     public CacheService get(String name) {
         CacheService cs = services.get(name);
         if (null == cs) {
-            cs = new EhCacheService(name);
+            ClassLoader classLoader = CacheServiceProvider.Impl.classLoader();
+            if (null != classLoader) {
+                Class<? extends CacheService> c = $.classForName("org.osgl.cache.impl.EhCacheService", classLoader);
+                cs = $.newInstance(c, name);
+            } else {
+                cs = new EhCacheService(name);
+            }
             services.putIfAbsent(name, cs);
         }
         return cs;

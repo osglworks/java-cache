@@ -63,7 +63,7 @@ public class EhCacheService extends CacheServiceBase {
 
     private int defaultTTL = 60;
 
-    EhCacheService(String name) {
+    public EhCacheService(String name) {
         if (S.notBlank(name)) {
             cacheName = name;
         }
