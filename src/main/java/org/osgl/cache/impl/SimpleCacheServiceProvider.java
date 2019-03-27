@@ -49,4 +49,10 @@ public class SimpleCacheServiceProvider implements CacheServiceProvider {
         }
         return cs;
     }
+
+    public static void reset() {
+        for (CacheService service : services.values()) {
+            service.clear();
+        }
+    }
 }
