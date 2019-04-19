@@ -1,5 +1,8 @@
 # OSGL Cache Change Log
 
+1.7.0 - 19/Apr/2019
+* Update osgl-tool to 1.19.2
+
 1.6.1
 * SimpleCacheServiceProvider - provide interface to reset all cache services #6
 * Versioned by osgl-version
