@@ -122,6 +122,7 @@ public class EhCacheService extends CacheServiceBase {
     @Override
     public void shutdown() {
         clear();
+        cacheManager.shutdown();
     }
 
     @Override
