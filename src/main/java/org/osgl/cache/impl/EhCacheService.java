@@ -48,6 +48,8 @@ import org.osgl.cache.CacheService;
 import org.osgl.cache.CacheServiceProvider;
 import org.osgl.util.S;
 
+import static net.sf.ehcache.Status.STATUS_ALIVE;
+
 /**
  * Created by luog on 17/02/14.
  */
@@ -61,24 +63,16 @@ public class EhCacheService extends CacheServiceBase {
 
     private String cacheName = DEF_CACHE_NAME;
 
+    private Configuration configuration;
+
     private int defaultTTL = 60;
 
     public EhCacheService(String name) {
         if (S.notBlank(name)) {
             cacheName = name;
         }
-        Configuration configuration = ConfigurationFactory.parseConfiguration();
+        configuration = ConfigurationFactory.parseConfiguration();
         configuration.setClassLoader(CacheServiceProvider.Impl.classLoader());
-        cacheManager = CacheManager.create(configuration);
-        Cache cache = cacheManager.getCache(cacheName);
-        if (null == cache) {
-            cache = (Cache)cacheManager.addCacheIfAbsent(cacheName);
-        }
-        this.cache = cache;
-        long l = this.cache.getCacheConfiguration().getTimeToLiveSeconds();
-        if (0 != l) {
-            defaultTTL = (int)l;
-        }
     }
 
     @Override
@@ -110,7 +104,11 @@ public class EhCacheService extends CacheServiceBase {
 
     @Override
     public void clear() {
-        cache.removeAll();
+        if (null != cache) {
+            if (cache.getStatus() == STATUS_ALIVE) {
+                cache.removeAll();
+            }
+        }
     }
 
     @Override
@@ -122,11 +120,23 @@ public class EhCacheService extends CacheServiceBase {
     @Override
     public void shutdown() {
         clear();
-        cacheManager.shutdown();
+        if (null != cacheManager) {
+            cacheManager.shutdown();
+        }
     }
 
     @Override
     public void startup() {
+        cacheManager = CacheManager.create(configuration);
+        Cache cache = cacheManager.getCache(cacheName);
+        if (null == cache) {
+            cache = (Cache)cacheManager.addCacheIfAbsent(cacheName);
+        }
+        this.cache = cache;
+        long l = this.cache.getCacheConfiguration().getTimeToLiveSeconds();
+        if (0 != l) {
+            defaultTTL = (int)l;
+        }
     }
 
     static CacheService defaultInstance() {
