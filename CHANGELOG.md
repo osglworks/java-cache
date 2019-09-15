@@ -1,6 +1,6 @@
 # OSGL Cache Change Log
 
-1.7.1
+1.7.1 - 15/Sep/2019
 * Ehcache service not shutdown properly cause JVM not able to exit #7
 
 1.7.0 - 19/Apr/2019
