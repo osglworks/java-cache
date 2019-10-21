@@ -1,5 +1,8 @@
 # OSGL Cache Change Log
 
+1.8.0
+* Update to osgl-tool-1.21.0
+
 1.7.1 - 15/Sep/2019
 * Ehcache service not shutdown properly cause JVM not able to exit #7
 

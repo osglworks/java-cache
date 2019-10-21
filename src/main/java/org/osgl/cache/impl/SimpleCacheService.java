@@ -222,7 +222,7 @@ public class SimpleCacheService extends CacheServiceBase {
     }
 
     @Override
-    public synchronized void shutdown() {
+    protected synchronized void internalShutdown() {
         clear();
         if (null != scheduler) {
             scheduler.shutdown();
@@ -231,7 +231,7 @@ public class SimpleCacheService extends CacheServiceBase {
     }
 
     @Override
-    public synchronized void startup() {
+    protected synchronized void internalStartup() {
         if (null == scheduler) {
             scheduler = new ScheduledThreadPoolExecutor(1, new TimerThreadFactory(name));
             scheduler.scheduleAtFixedRate(new Runnable() {

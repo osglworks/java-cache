@@ -192,7 +192,7 @@ public class MemcachedService extends CacheServiceBase {
     }
 
     @Override
-    public synchronized void shutdown() {
+    protected synchronized void internalShutdown() {
         if (null != client) {
             client.shutdown();
             client = null;
@@ -200,7 +200,7 @@ public class MemcachedService extends CacheServiceBase {
     }
 
     @Override
-    public synchronized void startup() {
+    protected synchronized void internalStartup() {
         if (null == client) {
             try {
                 initClient();

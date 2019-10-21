@@ -23,6 +23,9 @@ package org.osgl.cache.impl;
 import org.osgl.cache.CacheService;
 
 abstract class CacheServiceBase implements CacheService {
+
+    private CacheService.State state = State.INITIALIZED;
+
     @Override
     public int incr(String key) {
         Object o = get(key);
@@ -79,4 +82,23 @@ abstract class CacheServiceBase implements CacheService {
         throw new IllegalStateException("Only int or long value support decr operation");
     }
 
+    @Override
+    public final void shutdown() {
+        this.state = State.SHUTDOWN;
+    }
+
+    @Override
+    public final void startup() {
+        internalStartup();
+        this.state = State.STARTED;
+    }
+
+    @Override
+    public final State state() {
+        return this.state;
+    }
+
+    protected abstract void internalShutdown();
+
+    protected abstract void internalStartup();
 }

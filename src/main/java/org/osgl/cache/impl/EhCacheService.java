@@ -118,7 +118,7 @@ public class EhCacheService extends CacheServiceBase {
     }
 
     @Override
-    public void shutdown() {
+    protected void internalShutdown() {
         clear();
         if (null != cacheManager) {
             cacheManager.shutdown();
@@ -126,7 +126,7 @@ public class EhCacheService extends CacheServiceBase {
     }
 
     @Override
-    public void startup() {
+    protected void internalStartup() {
         cacheManager = CacheManager.create(configuration);
         Cache cache = cacheManager.getCache(cacheName);
         if (null == cache) {

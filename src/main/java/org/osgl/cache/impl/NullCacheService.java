@@ -108,4 +108,11 @@ public enum NullCacheService implements CacheService {
     public void startup() {
 
     }
+
+    @Override
+    public State state() {
+        return State.STARTED;
+    }
+
+
 }
