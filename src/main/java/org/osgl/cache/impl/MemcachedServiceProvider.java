@@ -37,11 +37,16 @@ public class MemcachedServiceProvider implements CacheServiceProvider {
 
     @Override
     public CacheService get() {
-        return MemcachedService.getInstance();
+        return get(CacheService.DEF_CACHE_NAME);
     }
 
     @Override
     public CacheService get(String name) {
         return MemcachedService.getInstance();
+    }
+
+    @Override
+    public void reset() {
+        MemcachedService.getInstance().shutdown();
     }
 }

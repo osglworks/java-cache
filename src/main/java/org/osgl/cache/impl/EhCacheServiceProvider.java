@@ -73,4 +73,16 @@ public class EhCacheServiceProvider implements CacheServiceProvider {
         }
         return cs;
     }
+
+    @Override
+    public void reset() {
+        _reset();
+    }
+
+    static void _reset() {
+        for (CacheService service : services.values()) {
+            service.shutdown();
+        }
+        services.clear();
+    }
 }

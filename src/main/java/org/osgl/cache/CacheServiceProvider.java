@@ -39,8 +39,10 @@ package org.osgl.cache;
  * #L%
  */
 
+import net.sf.ehcache.Ehcache;
 import org.osgl.$;
 import org.osgl.cache.impl.NullCacheService;
+import org.osgl.cache.impl.SimpleCacheService;
 import org.osgl.cache.impl.SimpleCacheServiceProvider;
 import org.osgl.util.S;
 import osgl.version.Version;
@@ -70,6 +72,8 @@ public interface CacheServiceProvider {
      */
     CacheService get(String name);
 
+    void reset();
+
     enum Impl implements CacheServiceProvider {
         NoCache() {
             @Override
@@ -81,6 +85,10 @@ public interface CacheServiceProvider {
             public CacheService get(String name) {
                 return get();
             }
+
+            @Override
+            public void reset() {
+            }
         },
         Simple() {
             @Override
@@ -91,6 +99,11 @@ public interface CacheServiceProvider {
             @Override
             public CacheService get(String name) {
                 return SimpleCacheServiceProvider.INSTANCE.get(name);
+            }
+
+            @Override
+            public void reset() {
+                SimpleCacheServiceProvider.INSTANCE.reset();
             }
         },
 
@@ -106,6 +119,12 @@ public interface CacheServiceProvider {
                 CacheServiceProvider fact = $.newInstance("org.osgl.cache.impl.EhCacheServiceProvider");
                 return fact.get(name);
             }
+
+            @Override
+            public void reset() {
+                Class type = $.classForName("org.osgl.cache.impl.EhCacheServiceProvider");
+                $.invokeStatic(type, "_reset");
+            }
         },
 
         Memcached() {
@@ -120,8 +139,16 @@ public interface CacheServiceProvider {
                 CacheServiceProvider fact = $.newInstance("org.osgl.cache.impl.MemcachedServiceProvider");
                 return fact.get(name);
             }
+
+            @Override
+            public void reset() {
+                Class type = $.classForName("org.osgl.cache.impl.MemcachedServiceProvider");
+                $.invokeStatic(type, "_reset");
+            }
         },
+
         Auto() {
+            private CacheServiceProvider realProvider;
             private CacheServiceProvider configured(String name) {
                 if (S.blank(name)) {
                     name = "osgl.cache.impl";
@@ -152,40 +179,39 @@ public interface CacheServiceProvider {
             }
             @Override
             public CacheService get() {
-                CacheServiceProvider csp = configured();
-                if (null != csp) {
-                    return csp.get();
+                realProvider = configured();
+                if (null != realProvider) {
+                    return realProvider.get();
                 }
                 try {
-                    return Memcached.get();
+                    realProvider = Memcached;
+                    return realProvider.get();
                 } catch (Throwable e) {
-                    // ignore
+                    realProvider = null;
                 }
                 try {
-                    return EhCache.get();
+                    realProvider = EhCache;
+                    return realProvider.get();
                 } catch (Throwable throwable) {
-                    // ignore
+                    realProvider = null;
                 }
-                return Simple.get();
+                realProvider = Simple;
+                return realProvider.get();
             }
 
             @Override
             public CacheService get(String name) {
-                CacheServiceProvider csp = configured(name);
-                if (null != csp) {
-                    return csp.get();
+                if (null == realProvider) {
+                    get();
                 }
-                try {
-                    return Memcached.get(name);
-                } catch (Throwable e) {
-                    // ignore
+                return realProvider.get(name);
+            }
+
+            @Override
+            public void reset() {
+                if (null != realProvider) {
+                    realProvider.reset();
                 }
-                try {
-                    return EhCache.get(name);
-                } catch (Throwable throwable) {
-                    // ignore
-                }
-                return Simple.get(name);
             }
         };
 

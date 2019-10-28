@@ -197,6 +197,7 @@ public class MemcachedService extends CacheServiceBase {
             client.shutdown();
             client = null;
         }
+        instance = null;
     }
 
     @Override
