@@ -1,6 +1,6 @@
 # OSGL Cache Change Log
 
-1.8.0
+1.8.0 - 03/Nov/2019
 * Update to osgl-tool-1.21.0
 
 1.7.1 - 15/Sep/2019
