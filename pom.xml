@@ -34,8 +34,8 @@
 
   <properties>
     <scm.url>git@github.com:osglworks/java-cache.git</scm.url>
-    <osgl-tool.version>1.21.0</osgl-tool.version>
-    <osgl-logging.version>1.5.0</osgl-logging.version>
+    <osgl-tool.version>1.25.0</osgl-tool.version>
+    <osgl-logging.version>1.5.1</osgl-logging.version>
     <spymemcached.version>2.12.3</spymemcached.version>
     <!-- the last 2.x version works for java 7 -->
     <ehcache.version>2.10.5</ehcache.version>
