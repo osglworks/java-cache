@@ -84,6 +84,7 @@ abstract class CacheServiceBase implements CacheService {
 
     @Override
     public final void shutdown() {
+        this.internalShutdown();
         this.state = State.SHUTDOWN;
     }
 
